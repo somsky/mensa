@@ -1,15 +1,18 @@
-from typing import TypedDict
-from enum import Enum
+#!/usr/bin/python3.8
+import sys
+import os
+dataSourcesDir = os.path.dirname(os.path.realpath(__file__)) + '/dataSources'
+sys.path.append(dataSourcesDir)
 
-class MealType(Enum):
-    VEGAN=1
-    VEGETARIAN=2
-    MEAT=2
+from stwnodatasource import StwnoDataSource
 
-class Menu(TypedDict):
-    title: str
-    name: str
-    price: float
-    mealType: MealType
+def main():
+    # todo: get the data source as a command line argument
+    dataSource = StwnoDataSource()
+    menu = dataSource.getMenu()
+    print(menu)
+    print('main working')
 
 
+if __name__ == '__main__':
+    main()

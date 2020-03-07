@@ -21,7 +21,6 @@ class Dish(TypedDict):
 
 class AbstractMenuSource(abc.ABC):
     @abc.abstractmethod
-    def getMenu(self, address) -> List[Dish]:
-        return [{'name': 'Schweiners', 'category': MealCategory.MAIN_DISH, 'nutritionType': NutritionType.MEAT, 'price': 4.50},
-                {'name': 'Knödel', 'category': MealCategory.SIDE_DISH, 'nutritionType': NutritionType.VEGETARIAN, 'price': 1.00}]
+    def getMenu(self, params) -> List[Dish]:
+        pass
         
