@@ -4,10 +4,44 @@ import os
 dataSourcesDir = os.path.dirname(os.path.realpath(__file__)) + '/dataSources'
 sys.path.append(dataSourcesDir)
 from stwnodatasource import StwnoDataSource
+from abstractmenusource import Dish, NutritionType
+from typing import List
 import curses
+from math import floor
 
-menuAddr = "https://app.mensaplan.de/api/11102/de.mensaplan.app.android.regensburg/reg7.json"
+# column width in percent for each of the attributes of a Dish. Longer strings are cut
+WIDTH_NAME = 60
+WIDTH_NUTRITION_TYPE = 10
+WIDTH_PRICE = 10
+COLUMN_SEPARATOR = '|'
 
+def dishToString(dish: Dish) -> str:
+    # set menu name
+    CC_NAME = str(floor(WIDTH_NAME / 100 * curses.COLS))
+    lineFormat = '{:' + CC_NAME + '.' + CC_NAME+ '}' + '|'
+
+    # set meal category
+    CC_NUT_TYPE = str(floor(WIDTH_NUTRITION_TYPE / 100 * curses.COLS))
+    mealCategorySymbol = 'n/a'
+    if dish.get('nutritionType') == NutritionType.MEAT:
+        mealCategorySymbol = 'MEAT'
+    elif dish.get('nutritionType') == NutritionType.VEGETARIAN:
+        mealCategorySymbol = 'VEGETA'
+    elif dish.get('nuritionType') == NutritionType.VEGAN:
+        mealCategorySymbol = 'VEGAN'
+    lineFormat += '{:' + CC_NUT_TYPE + '.' + CC_NUT_TYPE + '}' + '|'
+
+    # set price category
+    CC_PRICE = str(floor(WIDTH_PRICE / 100 * curses.COLS))
+    lineFormat += '{:' + CC_PRICE + '.' + CC_PRICE + '} €'
+
+    return lineFormat.format(dish.get('name', 'n/a'),  mealCategorySymbol, dish.get('price', 'n/a'))
+
+def renderMenu(window, menu: List[Dish]):
+    menu = sorted(menu, key=lambda dish: dish['category'])
+    # sorted(menu, key=doit)
+    for i in range(0, len(menu)):
+        window.addstr(i + 1, 1, dishToString(menu[i]))
 
 def main(stdscr):
 
@@ -22,8 +56,11 @@ def main(stdscr):
 
     menu_window = curses.newpad(win_height, win_width)
     menu_window.box() 
-    menu_window.addstr('hello, I am a window')
 
+    # todo: get the data source as a command line argument
+    dataSource = StwnoDataSource()
+    menu = dataSource.getMenu()
+    renderMenu(menu_window, menu)
 
     menu_window.refresh(0,
         0,
@@ -32,12 +69,6 @@ def main(stdscr):
         curses.LINES,
         curses.COLS
     )
-
-
-    # todo: get the data source as a command line argument
-    dataSource = StwnoDataSource()
-
-    menu = dataSource.getMenu()
 
     # Keep Window alive, read user input
     while True:
