@@ -2,11 +2,17 @@ import abc
 from typing import TypedDict, List
 from enum import Enum
 
-class NutritionType(Enum):
-    UNKNOWN=1
-    MEAT=2
-    VEGETARIAN=3
-    VEGAN=4
+class Nutrition():
+    class NutritionType():
+        def __init__(self, name, symbol):
+            self.name = name
+            self.symbol = symbol
+        def __eq__(self, other):
+            return self.name == other.name
+    unknown = NutritionType('unknown', 'n/a')
+    meat = NutritionType('meat', 'meaty')
+    vegetarian = NutritionType('vegetarian', 'veggy')
+    vegan = NutritionType('vegan', 'vega')
 
 class MealCategory(Enum):
     STARTER=1
@@ -21,7 +27,7 @@ class MealCategory(Enum):
 class Dish(TypedDict):
     name: str
     category: MealCategory
-    nutritionType: NutritionType
+    nutritionType: Nutrition
     price: float
 
 class AbstractMenuSource(abc.ABC):
