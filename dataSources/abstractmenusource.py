@@ -14,20 +14,22 @@ class Nutrition():
     vegetarian = NutritionType('vegetarian', 'veggy')
     vegan = NutritionType('vegan', 'vega')
 
-class MealCategory(Enum):
-    STARTER=1
-    MAIN_DISH=2
-    SIDE_DISH=3
-    DESSERT=4
-    def __lt__(self, other):
-        if self.__class__ is other.__class__:
-            return self.value < other.value
-        return NotImplemented
+class MealCategories():
+    class MealCategory():
+        def __init__(self, identifier: int, name: str):
+            self.identifier = identifier
+            self.name = name
+        def __lt__(self, other):
+            return self.identifier < other.identifier
+    starter = MealCategory(1, 'STARTERS')
+    mainDish = MealCategory(2, 'MAIN DISHES')
+    sideDish = MealCategory(3, 'SIDE DISHES')
+    dessert = MealCategory(4, 'DESSERTS')
 
 class Dish(TypedDict):
     name: str
-    category: MealCategory
-    nutritionType: Nutrition
+    category: MealCategories.MealCategory
+    nutritionType: Nutrition.NutritionType
     price: float
 
 class AbstractMenuSource(abc.ABC):

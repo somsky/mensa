@@ -4,10 +4,11 @@ import os
 dataSourcesDir = os.path.dirname(os.path.realpath(__file__)) + '/dataSources'
 sys.path.append(dataSourcesDir)
 from stwnodatasource import StwnoDataSource
-from abstractmenusource import Dish, Nutrition, MealCategory
+from abstractmenusource import Dish, Nutrition, MealCategories
 from typing import List
 import curses
 from math import floor
+
 # column width in percent for each of the attributes of a Dish. Longer strings are cut
 WIDTH_NAME = 60
 WIDTH_NUTRITION_TYPE = 10
