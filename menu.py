@@ -1,13 +1,13 @@
 #!/usr/bin/python3.8
-import sys
+from math import floor
+import curses
+from typing import List
 import os
+import sys
 dataSourcesDir = os.path.dirname(os.path.realpath(__file__)) + '/dataSources'
 sys.path.append(dataSourcesDir)
-from stwnodatasource import StwnoDataSource
 from abstractmenusource import Dish, Nutrition, MealCategories
-from typing import List
-import curses
-from math import floor
+from stwnodatasource import StwnoDataSource
 
 # column width in percent for each of the attributes of a Dish. Longer strings are cut
 WIDTH_NAME = 60
@@ -30,14 +30,22 @@ def dishToString(dish: Dish) -> str:
 
     return lineFormat.format(dish.get('name', 'n/a'),  dish.get('nutritionType').symbol, dish.get('price', 'n/a'))
 
+
 def renderMenu(window, menu: List[Dish]):
     menu = sorted(menu, key=lambda dish: dish['category'])
-    lastCategory = None
-    for i in range(0, len(menu)):
+    lastCat = None
+    windowIndex = 1
+    for menuIndex in range(0, len(menu)):
         # print heading for category
-        if menu[i].get('category') != lastCategory:
-            pass
-        window.addstr(i + 1, 1, dishToString(menu[i]))
+        currCat = menu[menuIndex].get('category')
+        if currCat != lastCat:
+            windowIndex += 1
+            window.addstr(windowIndex, 1, '-- {} --'.format(currCat.name))
+            windowIndex += 1
+            lastCat = currCat
+        window.addstr(windowIndex, 1, dishToString(menu[menuIndex]))
+        windowIndex += 1
+
 
 def main(stdscr):
 
@@ -51,7 +59,7 @@ def main(stdscr):
     win_width = curses.COLS
 
     menu_window = curses.newpad(win_height, win_width)
-    menu_window.box() 
+    menu_window.box()
 
     # todo: get the data source as a command line argument
     dataSource = StwnoDataSource()
@@ -59,12 +67,12 @@ def main(stdscr):
     renderMenu(menu_window, menu)
 
     menu_window.refresh(0,
-        0,
-        0,
-        0,
-        curses.LINES,
-        curses.COLS
-    )
+                        0,
+                        0,
+                        0,
+                        curses.LINES,
+                        curses.COLS
+                        )
 
     # Keep Window alive, read user input
     while True:
@@ -72,12 +80,12 @@ def main(stdscr):
         if key == 'q':
             sys.exit(1)
         menu_window.refresh(0,
-            0,
-            0,
-            0,
-            curses.LINES,
-            curses.COLS
-        )
+                            0,
+                            0,
+                            0,
+                            curses.LINES,
+                            curses.COLS
+                            )
 
 
 if __name__ == '__main__':
