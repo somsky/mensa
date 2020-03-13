@@ -32,18 +32,23 @@ def dishToString(dish: Dish) -> str:
 
 
 def renderMenu(window, menu: List[Dish]):
-    menu = sorted(menu, key=lambda dish: dish['category'])
+    menu.dishes = sorted(menu.dishes, key=lambda dish: dish['category'])
     lastCat = None
     windowIndex = 1
-    for menuIndex in range(0, len(menu)):
+    
+    window.addstr(windowIndex, 1, menu.header)
+    windowIndex += 1
+    window.addstr(windowIndex, 1, menu.date)
+    windowIndex += 1
+    for menuIndex in range(0, len(menu.dishes)):
         # print heading for category
-        currCat = menu[menuIndex].get('category')
+        currCat = menu.dishes[menuIndex].get('category')
         if currCat != lastCat:
             windowIndex += 1
             window.addstr(windowIndex, 1, '-- {} --'.format(currCat.name))
             windowIndex += 1
             lastCat = currCat
-        window.addstr(windowIndex, 1, dishToString(menu[menuIndex]))
+        window.addstr(windowIndex, 1, dishToString(menu.dishes[menuIndex]))
         windowIndex += 1
 
 

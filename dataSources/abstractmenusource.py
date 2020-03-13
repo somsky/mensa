@@ -1,7 +1,7 @@
 import abc
 from typing import TypedDict, List
 from enum import Enum
-
+from datetime import date
 
 class Nutrition():
     class NutritionType():
@@ -38,8 +38,16 @@ class Dish(TypedDict):
     nutritionType: Nutrition.NutritionType
     price: float
 
+class Menu():
+    def __init__(self, header: str, date: str, dishes: List[Dish]):
+        self.header = header
+        self.date = date
+        self.dishes = dishes
+    dishes: List[Dish]
+    header: str
+    date: date
 
 class AbstractMenuSource(abc.ABC):
     @abc.abstractmethod
-    def getMenu(self, params) -> List[Dish]:
+    def getMenu(self, params) -> Menu:
         pass
