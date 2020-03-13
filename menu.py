@@ -36,8 +36,11 @@ def renderMenu(window, menu: List[Dish]):
     lastCat = None
     windowIndex = 1
     
-    window.addstr(windowIndex, 1, menu.header)
-    windowIndex += 1
+    # print header, support multiline headers
+    headerLines = menu.header.split('\n')
+    for line in headerLines:
+        window.addstr(windowIndex, 1, line)
+        windowIndex += 1
     window.addstr(windowIndex, 1, menu.date)
     windowIndex += 1
     for menuIndex in range(0, len(menu.dishes)):
