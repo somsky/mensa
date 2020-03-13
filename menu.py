@@ -14,6 +14,7 @@ WIDTH_NAME = 60
 WIDTH_NUTRITION_TYPE = 10
 WIDTH_PRICE = 10
 COLUMN_SEPARATOR = '|'
+COLUMN_OFFSET_LEFT = 2
 
 def dishToString(dish: Dish) -> str:
     # set menu name
@@ -39,19 +40,21 @@ def renderMenu(window, menu: List[Dish]):
     # print header, support multiline headers
     headerLines = menu.header.split('\n')
     for line in headerLines:
-        window.addstr(windowIndex, 1, line)
+        window.addstr(windowIndex, COLUMN_OFFSET_LEFT, line)
         windowIndex += 1
-    window.addstr(windowIndex, 1, menu.date)
+
+    window.addstr(windowIndex, COLUMN_OFFSET_LEFT, menu.date)
     windowIndex += 1
+
     for menuIndex in range(0, len(menu.dishes)):
         # print heading for category
         currCat = menu.dishes[menuIndex].get('category')
         if currCat != lastCat:
             windowIndex += 1
-            window.addstr(windowIndex, 1, '-- {} --'.format(currCat.name))
+            window.addstr(windowIndex, COLUMN_OFFSET_LEFT, '-- {} --'.format(currCat.name))
             windowIndex += 1
             lastCat = currCat
-        window.addstr(windowIndex, 1, dishToString(menu.dishes[menuIndex]))
+        window.addstr(windowIndex, COLUMN_OFFSET_LEFT, dishToString(menu.dishes[menuIndex]))
         windowIndex += 1
 
 
