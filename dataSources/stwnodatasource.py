@@ -4,12 +4,15 @@ import urllib.request
 import json
 from datetime import date
 
+figlet = True
+
 try:
     import pyfiglet
 except:
     pass
 
 apiUrl = "https://app.mensaplan.de/api/11102/de.mensaplan.app.android.regensburg/reg7.json"
+
 
 class StwnoDataSource(AbstractMenuSource):
     def getMenu(self) -> List[Dish]:
@@ -21,12 +24,13 @@ class StwnoDataSource(AbstractMenuSource):
         if len(rawMenu) == 0:
             raise Exception('Fetched menu contained no menu for today')
         rawMenu = rawMenu[0]
+        menu = {category['name']: [{'name': meal['name'].replace('\xad', ''), 'nutritionType': Nutrition.meat, 'pricing': meal['pricing']
+                                    ['for'][0] / 100} for meal in category['meals']] for category in rawMenu['categories']}
         menuDate = rawMenu['date']
         restaurantName = res['name']
-        dishes = { 'main': [{'name': 'Schweiners', 'nutritionType': Nutrition.meat, 'pricing': 4.20}]}
-        
-        try:
+
+        if figlet:
             header = pyfiglet.figlet_format(restaurantName, font='slant')
-        except:
+        else:
             header = restaurantName
-        return Menu(header, menuDate, dishes)
+        return Menu(header, menuDate, menu)
