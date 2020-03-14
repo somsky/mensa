@@ -18,18 +18,17 @@ COLUMN_OFFSET_LEFT = 2
 
 def dishToString(dish: Dish) -> str:
     # set menu name
-    CC_NAME = str(floor(WIDTH_NAME / 100 * curses.COLS))
-    lineFormat = '{:' + CC_NAME + '.' + CC_NAME + '}' + '|'
+    CC_NAME = floor(WIDTH_NAME / 100 * curses.COLS)
+    line = dish['name'].ljust(CC_NAME)
 
     # set meal category
-    CC_NUT_TYPE = str(floor(WIDTH_NUTRITION_TYPE / 100 * curses.COLS))
-    lineFormat += '{:' + CC_NUT_TYPE + '.' + CC_NUT_TYPE + '}' + '|'
+    CC_NUT_TYPE = floor(WIDTH_NUTRITION_TYPE / 100 * curses.COLS)
+    line += dish['nutritionType'].symbol.center(CC_NUT_TYPE)
 
     # set price category
-    CC_PRICE = str(floor(WIDTH_PRICE / 100 * curses.COLS))
-    lineFormat += '{:' + CC_PRICE + '.2f'  + '} €'
-
-    return lineFormat.format(dish.get('name', 'n/a'),  dish.get('nutritionType').symbol, dish.get('pricing', 'n/a'))
+    CC_PRICE = floor(WIDTH_PRICE / 100 * curses.COLS)
+    line += '{:.2f}€'.format(dish['pricing']).center(CC_PRICE)
+    return line
 
 
 def renderMenu(window, menu: Menu):
