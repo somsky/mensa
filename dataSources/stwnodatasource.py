@@ -1,6 +1,5 @@
-import abstractmenusource
 from typing import List
-from abstractmenusource import Nutrition, MealCategories, Dish, AbstractMenuSource, Menu
+from abstractmenusource import Nutrition, Dish, AbstractMenuSource, Menu
 import urllib.request
 import json
 from datetime import date
@@ -14,24 +13,20 @@ apiUrl = "https://app.mensaplan.de/api/11102/de.mensaplan.app.android.regensburg
 
 class StwnoDataSource(AbstractMenuSource):
     def getMenu(self) -> List[Dish]:
-        #try:
         req = urllib.request.urlopen(apiUrl)
         res = json.loads(req.read())
         today = str(date.today())
-        # print (res['days'])
+        today = '2020-03-13'
         rawMenu = [menu for menu in res['days'] if today in menu['iso-date']]
+        if len(rawMenu) == 0:
+            raise Exception('Fetched menu contained no menu for today')
         rawMenu = rawMenu[0]
         menuDate = rawMenu['date']
         restaurantName = res['name']
-
-        dishes = [{'name': 'Schweiners', 'category': MealCategories.mainDish, 'nutritionType': Nutrition.meat, 'price': 4.50},
-                {'name': 'Knödel', 'category': MealCategories.sideDish,
-                    'nutritionType': Nutrition.vegetarian, 'price': 1.00},
-                {'name': 'Krautschupfnudeln', 'category': MealCategories.mainDish,
-                    'nutritionType': Nutrition.vegetarian, 'price': 2.00},
-                {'name': 'Pommes', 'category': MealCategories.sideDish, 'nutritionType': Nutrition.vegetarian, 'price': 1.50}]
+        dishes = { 'main': [{'name': 'Schweiners', 'nutritionType': Nutrition.meat, 'pricing': 4.20}]}
+        
         try:
             header = pyfiglet.figlet_format(restaurantName, font='slant')
         except:
             header = restaurantName
-        return Menu(header, '15.03.2020', dishes)
+        return Menu(header, menuDate, dishes)

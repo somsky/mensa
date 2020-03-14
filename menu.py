@@ -6,7 +6,7 @@ import os
 import sys
 dataSourcesDir = os.path.dirname(os.path.realpath(__file__)) + '/dataSources'
 sys.path.append(dataSourcesDir)
-from abstractmenusource import Dish, Nutrition, MealCategories
+from abstractmenusource import Dish, Nutrition, Menu
 from stwnodatasource import StwnoDataSource
 
 # column width in percent for each of the attributes of a Dish. Longer strings are cut
@@ -27,16 +27,13 @@ def dishToString(dish: Dish) -> str:
 
     # set price category
     CC_PRICE = str(floor(WIDTH_PRICE / 100 * curses.COLS))
-    lineFormat += '{:' + CC_PRICE + '.' + CC_PRICE + '} €'
+    lineFormat += '{:' + CC_PRICE + '.2f'  + '} €'
 
-    return lineFormat.format(dish.get('name', 'n/a'),  dish.get('nutritionType').symbol, dish.get('price', 'n/a'))
+    return lineFormat.format(dish.get('name', 'n/a'),  dish.get('nutritionType').symbol, dish.get('pricing', 'n/a'))
 
 
-def renderMenu(window, menu: List[Dish]):
-    menu.dishes = sorted(menu.dishes, key=lambda dish: dish['category'])
-    lastCat = None
+def renderMenu(window, menu: Menu):
     windowIndex = 1
-    
     # print header, support multiline headers
     headerLines = menu.header.split('\n')
     for line in headerLines:
@@ -46,17 +43,17 @@ def renderMenu(window, menu: List[Dish]):
     window.addstr(windowIndex, COLUMN_OFFSET_LEFT, menu.date)
     windowIndex += 1
 
-    for menuIndex in range(0, len(menu.dishes)):
-        # print heading for category
-        currCat = menu.dishes[menuIndex].get('category')
-        if currCat != lastCat:
-            windowIndex += 1
-            window.addstr(windowIndex, COLUMN_OFFSET_LEFT, '-- {} --'.format(currCat.name))
-            windowIndex += 1
-            lastCat = currCat
-        window.addstr(windowIndex, COLUMN_OFFSET_LEFT, dishToString(menu.dishes[menuIndex]))
+    for mealCategory, dishes in menu.dishes.items():
+        windowIndex += 1
+        window.addstr(windowIndex, COLUMN_OFFSET_LEFT, '-- {} --'.format(mealCategory))
+        windowIndex += 1
+        for dish in dishes:
+            window.addstr(windowIndex, COLUMN_OFFSET_LEFT, dishToString(dish))
         windowIndex += 1
 
+
+def renderError(window, e):
+    window.addstr(1, COLUMN_OFFSET_LEFT, str(e))
 
 def main(stdscr):
 
@@ -74,8 +71,11 @@ def main(stdscr):
 
     # todo: get the data source as a command line argument
     dataSource = StwnoDataSource()
-    menu = dataSource.getMenu()
-    renderMenu(menu_window, menu)
+    try:
+        menu = dataSource.getMenu()
+        renderMenu(menu_window, menu)
+    except Exception as e:
+        renderError(menu_window, e)
 
     menu_window.refresh(0,
                         0,

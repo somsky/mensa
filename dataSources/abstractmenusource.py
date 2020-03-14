@@ -1,4 +1,5 @@
-import abc from typing import TypedDict, List
+import abc
+from typing import TypedDict, List
 from enum import Enum
 from datetime import date
 from typing import Dict
