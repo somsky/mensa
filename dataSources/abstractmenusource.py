@@ -1,7 +1,7 @@
-import abc
-from typing import TypedDict, List
+import abc from typing import TypedDict, List
 from enum import Enum
 from datetime import date
+from typing import Dict
 
 class Nutrition():
     class NutritionType():
@@ -17,35 +17,21 @@ class Nutrition():
     vegan = NutritionType('vegan', 'vega')
 
 
-class MealCategories():
-    class MealCategory():
-        def __init__(self, identifier: int, name: str):
-            self.identifier = identifier
-            self.name = name
-
-        def __lt__(self, other):
-            return self.identifier < other.identifier
-
-    starter = MealCategory(1, 'STARTERS')
-    mainDish = MealCategory(2, 'MAIN DISHES')
-    sideDish = MealCategory(3, 'SIDE DISHES')
-    dessert = MealCategory(4, 'DESSERTS')
-
-
 class Dish(TypedDict):
     name: str
-    category: MealCategories.MealCategory
     nutritionType: Nutrition.NutritionType
-    price: float
+    pricing: float
+
 
 class Menu():
     def __init__(self, header: str, date: str, dishes: List[Dish]):
         self.header = header
         self.date = date
         self.dishes = dishes
-    dishes: List[Dish]
+    dishes: Dict[str, List[Dish]]
     header: str
     date: date
+
 
 class AbstractMenuSource(abc.ABC):
     @abc.abstractmethod
