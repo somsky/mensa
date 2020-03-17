@@ -9,13 +9,13 @@ figlet = True
 try:
     import pyfiglet
 except:
-    pass
+    figlet = False
 
 apiUrl = "https://app.mensaplan.de/api/11102/de.mensaplan.app.android.regensburg/reg7.json"
 
 
 class StwnoDataSource(AbstractMenuSource):
-    def getMenu(self) -> List[Dish]:
+    def getMenu(self) -> Menu:
         req = urllib.request.urlopen(apiUrl)
         res = json.loads(req.read())
         today = str(date.today())

@@ -8,6 +8,9 @@ dataSourcesDir = os.path.dirname(os.path.realpath(__file__)) + '/dataSources'
 sys.path.append(dataSourcesDir)
 from abstractmenusource import Dish, Nutrition, Menu
 from stwnodatasource import StwnoDataSource
+import argparse
+import importlib
+import inspect
 
 # column width in percent for each of the attributes of a Dish. Longer strings are cut
 WIDTH_NAME = 60
@@ -54,11 +57,9 @@ def renderMenu(window, menu: Menu):
 def renderError(window, e):
     window.addstr(1, COLUMN_OFFSET_LEFT, str(e))
 
-def main(stdscr):
-
-    # curses stuff, set up the TUI
+def main(dataSource, datasource_args):
+    stdscr = curses.initscr()
     stdscr.refresh()
-
     curses.start_color()
     curses.use_default_colors()
 
@@ -68,10 +69,8 @@ def main(stdscr):
     menu_window = curses.newpad(win_height, win_width)
     menu_window.box()
 
-    # todo: get the data source as a command line argument
-    dataSource = StwnoDataSource()
     try:
-        menu = dataSource.getMenu()
+        menu = dataSource.getMenu(datasource_args) if datasource_args else dataSource.getMenu()
         renderMenu(menu_window, menu)
     except Exception as e:
         renderError(menu_window, e)
@@ -99,4 +98,23 @@ def main(stdscr):
 
 
 if __name__ == '__main__':
-    curses.wrapper(main)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('datasource', help='The name of the datasource you want to fetch todays menu from')
+    parser.add_argument('-da', '--datasource_arg', help='Optional argument to send to the specified datasource')
+    args = parser.parse_args()
+    try:
+        dataSourceModule = importlib.import_module(args.datasource)
+    except ModuleNotFoundError:
+        print('[ERR] Datasource "{}" not found'.format(args.datasource))
+        sys.exit(-1)
+    except Exception as e:
+        print(e)
+        sys.exit(-1)
+    dataSourceClassNames = [m[0] for m in inspect.getmembers(dataSourceModule, inspect.isclass) if m[1].__module__ == args.datasource]
+    dataSourceClasses = [getattr(dataSourceModule, dataSourceClassName) for dataSourceClassName in dataSourceClassNames]
+    if len(dataSourceClasses) == 0:
+        print('The specified datasource module contains serveral classes implementing the datasource interface')
+        sys.exit(-1)
+    elif len(dataSourceClasses) > 1:
+        print('The specified datasource module contains no classes implementing the datasource interface')
+    main(dataSourceClasses[0](), args.datasource_arg)
