@@ -6,6 +6,7 @@ import os
 import sys
 dataSourcesDir = os.path.dirname(os.path.realpath(__file__)) + '/dataSources'
 sys.path.append(dataSourcesDir)
+# pylint: disable=import-error
 from abstractmenusource import Dish, Nutrition, Menu
 from stwnodatasource import StwnoDataSource
 import argparse
@@ -21,14 +22,17 @@ COLUMN_OFFSET_LEFT = 2
 
 def dishToString(dish: Dish) -> str:
     # set menu name
+    # pylint: disable=no-member
     CC_NAME = floor(WIDTH_NAME / 100 * curses.COLS)
     line = dish['name'].ljust(CC_NAME)
 
     # set meal category
+    # pylint: disable=no-member
     CC_NUT_TYPE = floor(WIDTH_NUTRITION_TYPE / 100 * curses.COLS)
     line += dish['nutritionType'].symbol.center(CC_NUT_TYPE)
 
     # set price category
+    # pylint: disable=no-member
     CC_PRICE = floor(WIDTH_PRICE / 100 * curses.COLS)
     line += '{:.2f}€'.format(dish['pricing']).center(CC_PRICE)
     return line
@@ -63,7 +67,9 @@ def main(dataSource, datasource_args):
     curses.start_color()
     curses.use_default_colors()
 
+    # pylint: disable=no-member
     win_height = curses.LINES
+    # pylint: disable=no-member
     win_width = curses.COLS
 
     menu_window = curses.newpad(win_height, win_width)

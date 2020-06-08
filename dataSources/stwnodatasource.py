@@ -19,7 +19,6 @@ class StwnoDataSource(AbstractMenuSource):
         req = urllib.request.urlopen(apiUrl)
         res = json.loads(req.read())
         today = str(date.today())
-        today = '2020-03-13'
         rawMenu = [menu for menu in res['days'] if today in menu['iso-date']]
         if len(rawMenu) == 0:
             raise Exception('Fetched menu contained no menu for today')
